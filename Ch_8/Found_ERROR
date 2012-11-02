@@ -1,0 +1,31 @@
+calculate_AvgNodes(...), DX_Id:"7.58764041049334213660e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041049487448868e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041049647508317e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041049799916344e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041049953668541e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041050110315869e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041050269134547e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041050422886743e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041050570848675e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041050722222727e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041050874837550e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041051026831988e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041051178206040e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041051327408743e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041051475267278e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041051622712222e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041051772948901e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041051918636086e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041052074146041e-10"
+calculate_AvgNodes(...), DX_Id:"7.58764041053443750340e-10"
+Result:{aborted,{{badmatch,[]},
+                 [{population_monitor,calculate_SpecieFitness,1},
+                  {population_monitor,update_SpecieSTAT,2},
+                  {population_monitor,'-gather_STATS/2-lc$^0/1-0-',2},
+                  {population_monitor,'-gather_STATS/2-fun-0-',3},
+                  {mnesia_tm,apply_fun,3},
+                  {mnesia_tm,execute_transaction,5},
+                  {population_monitor,gather_STATS,2},
+                  {population_monitor,handle_cast,2}]}}
+Update_Champions result:{atomic,done}
+

@@ -1,0 +1,22 @@
+#Avg Fitness Vs Evaluations, Morphology:pole_balancing
+500 12099.145400427997 18471.135474493833
+
+
+#Avg Neurons Vs Evaluations, Morphology:pole_balancing
+500 1.9146111111111117 0.7050360914455315
+
+
+#Avg Diversity Vs Evaluations, Morphology:pole_balancing
+500 7.26 1.6710475756243448
+
+
+#Avg. Max Fitness Vs Evaluations, Morphology:pole_balancing
+500 19760.784186825535
+
+
+#Avg. Min Fitness Vs Evaluations, Morphology:pole_balancing
+500 1861.4970333271492
+
+
+#Specie-Population Turnover Vs Evaluations, Morphology:pole_balancing
+500 500.0
