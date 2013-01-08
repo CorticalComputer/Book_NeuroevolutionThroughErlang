@@ -273,7 +273,7 @@ loop(S)->
 			{public,ScapeName}->
 				ets:lookup_element(IdsNPIds,ScapeName,2)
 		end,
-		APId ! {self(),{AId,Cx_PId,Scape,AName,A#actuator.parameters,Fanin_PIds}},
+		APId ! {self(),{AId,Cx_PId,Scape,AName,A#actuator.vl,A#actuator.parameters,Fanin_PIds}},
 		link_Actuators(Actuator_Ids,IdsNPIds);
 	link_Actuators([],_IdsNPIds)->
 		ok.
