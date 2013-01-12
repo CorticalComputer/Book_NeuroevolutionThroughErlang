@@ -282,9 +282,9 @@ metabolics([Avatar|Avatars],Acc)->
 					%RespawnedAvatar = respawn_avatar(Avatar),
 					metabolics(Avatars,[Avatar|Acc])
 			end;	
-		flatlander ->
+		predator ->
 			Energy = Avatar#avatar.energy,
-			%io:format("Flatlander:~p~n",[Energy]),
+			%io:format("Predator:~p~n",[Energy]),
 			U_Avatar=Avatar#avatar{energy = Energy -0.01},
 			metabolics(Avatars,[U_Avatar|Acc]);
 		prey ->
@@ -374,10 +374,10 @@ collision_detection(OperatorAvatar,EnergyAcc,Kills,[Avatar|Avatars],Acc)->
 			{X,Y}= OperatorAvatar#avatar.loc,
 			{DX,DY} = OperatorAvatar#avatar.direction,
 			{Xav,Yav}=Avatar#avatar.loc,
-			Penetration=case (OperatorAvatar#avatar.type == flatlander) or (OperatorAvatar#avatar.spear == true) of
+			Penetration=case (OperatorAvatar#avatar.type == predator) or (OperatorAvatar#avatar.spear == true) of
 				true ->
 					Spear_UnitRay = {DX*math:cos(0) - DY*math:sin(0), DX*math:sin(0) + DY*math:cos(0)},
-					{InterDist,_Color}=sensors:shortest_intrLine({{X,Y},Spear_UnitRay},[Avatar],{inf,void}),
+					{InterDist,_Color}=sensor:shortest_intrLine({{X,Y},Spear_UnitRay},[Avatar],{inf,void}),
 					(InterDist =/= -1) and (InterDist < (2 + OperatorAvatar#avatar.r));%TODO, spear length should be avatar defined, not 2.
 				false ->
 					false
@@ -456,10 +456,10 @@ create_avatar(Morphology,Specie_Id)->
 	create_avatar(Morphology,Specie_Id,genotype:generate_UniqueId(),Stats,respawn,undefined).
 create_avatar(Morphology,Specie_Id,Id,Stats,Parameters)->
 	create_avatar(Morphology,Specie_Id,Id,Stats,Parameters,undefined).
-create_avatar(Morphology,Specie_Id,Id,{CF,CT,TotNeurons},void,InitEnergy) when (Morphology == flatlander)  or (Morphology == prey) or (Morphology == automaton)->
+create_avatar(Morphology,Specie_Id,Id,{CF,CT,TotNeurons},void,InitEnergy) when (Morphology == predator)  or (Morphology == prey) or (Morphology == automaton)->
 	case Morphology of
-		flatlander->
-			io:format("Creating Flatlander~n"),
+		predator->
+			io:format("Creating Predator~n"),
 			%{CF,CT,TotNeurons} = Stats,
 			Color = red,
 			%Color=visor:ct2color(CT),
@@ -1031,10 +1031,10 @@ world_behavior(Collision,Penetration,OAvatar,Avatar)->
 					Avatar
 			end,
 			{0,void,OAvatar,U_Avatar};
-		(OAType == flatlander) and (AType == prey) and (Penetration == true)->
+		(OAType == predator) and (AType == prey) and (Penetration == true)->
 %			io:format("Hunter: ~p ate a Prey: ~p~n",[OAvatar#avatar.id,Avatar#avatar.id]),
 			{500,destroy,OAvatar,Avatar};
-		(OAType == flatlander) and (AType == prey) and (Collision == true)->
+		(OAType == predator) and (AType == prey) and (Collision == true)->
 			U_Avatar=case ?COLLISIONS of
 				on ->
 					PushStrength = 1,%Push_Hard
@@ -1043,7 +1043,7 @@ world_behavior(Collision,Penetration,OAvatar,Avatar)->
 					Avatar
 			end,
 			{0,void,OAvatar,U_Avatar};
-		(OAType == flatlander) and (AType == flatlander)  and (Penetration == true)->
+		(OAType == predator) and (AType == predator)  and (Penetration == true)->
 			U_Avatar=case ?COLLISIONS of
 				on ->
 					PushStrength = 1,%Push_Very_Hard %TODO, pushing must be done from the tip of the sword.
@@ -1052,7 +1052,7 @@ world_behavior(Collision,Penetration,OAvatar,Avatar)->
 					Avatar
 			end,
 			{0,void,OAvatar,U_Avatar};
-		(OAType == flatlander) and (AType == flatlander)  and (Collision == true)->
+		(OAType == predator) and (AType == predator)  and (Collision == true)->
 			U_Avatar=case ?COLLISIONS of
 				on ->
 					PushStrength = 0.1,%Push_Hard
@@ -1061,7 +1061,7 @@ world_behavior(Collision,Penetration,OAvatar,Avatar)->
 					Avatar
 			end,
 			{0,void,OAvatar,U_Avatar};
-		(OAType == flatlander) and ((AType == plant) or (AType == poison)) and (Collision == true)->
+		(OAType == predator) and ((AType == plant) or (AType == poison)) and (Collision == true)->
 			U_Avatar=case ?COLLISIONS of
 				on ->
 					PushStrength = 0,%Push_asside

@@ -88,11 +88,11 @@ distance_scanner(Exoself_PId,VL,[Spread,Density,RadialOffset],Scape)->
 			Self = lists:keyfind(Exoself_PId,2,Avatars),
 			Loc = Self#avatar.loc,
 			Direction = Self#avatar.direction,
-			distance_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(self(), 2, Avatars))
+			Result=distance_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(self(), 2, Avatars)),
+			Result
 	end.
 
 color_scanner(Exoself_PId,VL,[Spread,Density,RadialOffset],Scape)->
-	%io:format("Scape:~p~n",[Scape]),
 	case gen_server:call(Scape,{get_all,avatars,Exoself_PId}) of
 		destroyed->
 			lists:duplicate(VL,-1);
@@ -101,7 +101,8 @@ color_scanner(Exoself_PId,VL,[Spread,Density,RadialOffset],Scape)->
 			%io:format("Self:~p~n",[Self]),
 			Loc = Self#avatar.loc,
 			Direction = Self#avatar.direction,
-			color_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(self(), 2, Avatars))
+			Result=color_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(self(), 2, Avatars)),
+			Result
 	end.
 	
 %Input: ViewAngle= Radian, Density= n, Gaze direction= {SensorLoc,Direction}.

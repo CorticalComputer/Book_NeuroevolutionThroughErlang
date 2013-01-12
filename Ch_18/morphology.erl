@@ -132,7 +132,7 @@ prey(sensors)->
 	Energy_Scanners = [#sensor{name=energy_scanner,type=standard,scape={public,flatland},format=no_geo,vl=Density,parameters=[Spread,Density,ROffset]} ||
 		Spread <-[Pi/2], Density <-[5], ROffset<-[Pi*0/2]],
 	Stat_Readers = [#sensor{name=Name,type=standard,scape={public,flatland},format=no_geo,vl=Density,parameters=Param} || {Name,Density,Param} <- [{energy_reader,1,[]}]],
-	Color_Scanners.%++Distance_Scanners.
+	Distance_Scanners.
 	
 generate_id() ->
 	{MegaSeconds,Seconds,MicroSeconds} = now(), 

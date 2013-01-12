@@ -14,7 +14,7 @@
 -behaviour(gen_server).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Population Monitor Options & Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
--define(INIT_CONSTRAINTS,[#constraint{morphology=Morphology,connection_architecture=CA, population_evo_alg_f=steady_state,agent_encoding_types=[neural],substrate_plasticities=[iterative],substrate_linkforms = [l2l_feedforward]} || Morphology<-[prey],CA<-[feedforward]]).
+-define(INIT_CONSTRAINTS,[#constraint{morphology=Morphology,connection_architecture=CA, population_evo_alg_f=steady_state,agent_encoding_types=[neural],substrate_plasticities=[iterative],substrate_linkforms = [l2l_feedforward]} || Morphology<-[prey,predator],CA<-[feedforward]]).
 -record(state,{
 	op_mode = gt,
 	population_id = test,
