@@ -88,7 +88,7 @@ distance_scanner(Exoself_PId,VL,[Spread,Density,RadialOffset],Scape)->
 			Self = lists:keyfind(Exoself_PId,2,Avatars),
 			Loc = Self#avatar.loc,
 			Direction = Self#avatar.direction,
-			Result=distance_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(self(), 2, Avatars)),
+			Result=distance_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(Exoself_PId, 2, Avatars)),
 			Result
 	end.
 
@@ -101,7 +101,7 @@ color_scanner(Exoself_PId,VL,[Spread,Density,RadialOffset],Scape)->
 			%io:format("Self:~p~n",[Self]),
 			Loc = Self#avatar.loc,
 			Direction = Self#avatar.direction,
-			Result=color_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(self(), 2, Avatars)),
+			Result=color_scanner(silent,{1,0,0},Density,Spread,Loc,Direction,lists:keydelete(Exoself_PId, 2, Avatars)),
 			Result
 	end.
 	
