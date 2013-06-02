@@ -60,7 +60,7 @@ start_link() ->
 	gen_server:start_link(?MODULE, [], []).
     
 start() -> 
-	gen_server:start(?MODULE, [], []).
+	init_population(#state{},?INIT_CONSTRAINTS).
 
 stop() ->
 	gen_server:cast(monitor,{stop,normal}).
