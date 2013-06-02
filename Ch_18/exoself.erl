@@ -169,7 +169,7 @@ loop(S)->
 					gen_server:cast(S#state.pm_pid,{S#state.agent_id,terminated,U_HighestFitness});
 				false -> %Continue training
 					%io:format("exoself state:~p~n",[S]),
-					reenter_PublicScape(S#state.public_scape_pids,[genotype:dirty_read({sensor,Id})||Id<-S#state.spids],[genotype:dirty_read({actuator,Id})||Id<-S#state.apids],S#state.specie_id,S#state.morphology,length(S#state.nids)),
+					reenter_PublicScape(S#state.public_scape_pids,[genotype:dirty_read({sensor,ets:lookup_element(IdsNPIds,Id,2)})||Id<-S#state.spids],[genotype:dirty_read({actuator,ets:lookup_element(IdsNPIds,Id,2)})||Id<-S#state.apids],S#state.specie_id,S#state.morphology,length(S#state.nids)),
 					TuningSelectionFunction=S#state.tuning_selection_f,
 					PerturbationRange = S#state.perturbation_range,
 					AnnealingParameter = S#state.annealing_parameter,

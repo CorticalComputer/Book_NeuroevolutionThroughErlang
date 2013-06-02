@@ -21,7 +21,6 @@
 -define(PLANT_GROWTH,off).
 -define(SPAWN_LOC,[{1,[0,0]},{2,[2500,0]},{3,[5000,0]},{4,[5000,2500]},{5,[5000,5000]},{6,[2500,5000]},{7,[0,5000]},{8,[0,2500]}]).
 -define(SECTOR_SIZE,10).
--define(SLAVE_ZEROxxx,1).
 %%==================================================================== API
 %%--------------------------------------------------------------------
 %% Function: start_link() -> {ok,Pid} | ignore | {error,Error}
@@ -142,6 +141,7 @@ handle_call({enter,Morphology,Specie_Id,CF,CT,TotNeurons,Exoself_PId},{From_PId,
 				{Visor_PId,Canvas} ->
 					visor:draw_avatar(Canvas,create_avatar(Morphology,Specie_Id,Exoself_PId,Stats,void))
 			end,
+			io:format("Avatar2:~p~n",[Avatar]),
 			{done,State#scape{avatars = [Avatar|Avatars]}}
 	end,
 	{reply,Reply,U_State};
@@ -367,9 +367,6 @@ collision_detection(OperatorAvatar,EnergyAcc,Kills,[Avatar|Avatars],Acc)->
 		(Avatar#avatar.type == wall) ->
 			U_OperatorAvatar = world_wall_collision(OperatorAvatar,Avatar),
 			collision_detection(U_OperatorAvatar,EnergyAcc,Kills,Avatars,[Avatar|Acc]);
-		%(Avatar#avatar.type == rock1)-> %These are circles, some can be moved, others can not. The amount of energy needed to move the rock is based on color, size.
-		%	{U_OperatorAvatar,U_Avatar} = world:rock_collision(OperatorAvatar,Avatar),
-		%	collision_detection(U_OperatorAvatar,EnergyAcc,Kills,Avatars,[U_Avatar|Acc]);
 		true ->
 			{X,Y}= OperatorAvatar#avatar.loc,
 			{DX,DY} = OperatorAvatar#avatar.direction,
@@ -459,11 +456,11 @@ create_avatar(Morphology,Specie_Id,Id,Stats,Parameters)->
 create_avatar(Morphology,Specie_Id,Id,{CF,CT,TotNeurons},void,InitEnergy) when (Morphology == predator)  or (Morphology == prey) or (Morphology == automaton)->
 	case Morphology of
 		predator->
-			io:format("Creating Predator~n"),
+			io:format("Creating Predator:~p~n",[{CF,CT,Id}]),
 			%{CF,CT,TotNeurons} = Stats,
 			Color = red,
 			%Color=visor:ct2color(CT),
-			Loc = {X,Y} = {random:uniform(500)+900,random:uniform(500)},
+			Loc = {X,Y} = {random:uniform(400)+300,random:uniform(400)+300},
 			Direction ={DX,DY} = {-1/math:sqrt(2),-1/math:sqrt(2)},
 			%Loc = {X,Y} = {random:uniform(round(XMax/2)) + XMax/2 -R,random:uniform(round(YMax/2))+YMax/2 -R},
 			Energy =case InitEnergy of
@@ -489,13 +486,14 @@ create_avatar(Morphology,Specie_Id,Id,{CF,CT,TotNeurons},void,InitEnergy) when (
 				loc = Loc,
 				direction = Direction,
 				r = R,
+				mass = Mass,
 				objects = Objects,
 				actuators = CF,
 				sensors =CT,
 				stats = TotNeurons
 			};
 		prey ->
-			%io:format("Creating Prey:~n CF:~p~n CT:~p~n",[CF,CT]),
+			io:format("Creating Prey:~p~n",[{CF,CT,Id}]),
 			%{CF,CT,TotNeurons} = Stats,
 			Direction = {DX,DY} = {1/math:sqrt(2),1/math:sqrt(2)},
 			{X,Y} = {random:uniform(800),random:uniform(500)},
@@ -677,34 +675,6 @@ create_avatar(Morphology,Specie_Id,Id,undefined,Parameters,undefined) when (Morp
 				r = R,
 				objects = Objects,
 				state = Parameters
-			};
-		fire_pit ->
-			io:format("Creating FirePit~n"),
-			Direction={1/math:sqrt(2),1/math:sqrt(2)},
-			{X,Y,R,Energy} = Parameters,
-			Objects = [{circle,undefined,red,{X,Y},[{X,Y}],R}],
-			#avatar{
-				id = Id,
-				type = Morphology,
-				energy = Energy,
-				loc = {X,Y},
-				direction = Direction,
-				r = R,
-				objects = Objects
-			};
-		beacon ->
-			io:format("Creating Beacon~n"),
-			Direction={1/math:sqrt(2),1/math:sqrt(2)},
-			{X,Y,R,Energy} = Parameters,
-			Objects = [{circle,undefined,white,{X,Y},[{X,Y}],R}],
-			#avatar{
-				id = beacon,
-				type = Morphology,
-				energy = Energy,
-				loc = {X,Y},
-				direction = Direction,
-				r = R,
-				objects = Objects
 			}
 	end.
 
@@ -720,6 +690,7 @@ destroy_avatar(ExoSelf_PId,State)->
 				undefined->
 					done;
 				{Visor_PId,_Canvas} ->
+					io:format("Avatar:~p~n",[Avatar]),
 					[gs:destroy(Id) || {_ObjType,Id,_Color,_Pivot,_Coords,_Parameter} <- Avatar#avatar.objects]
 			end
 	end,
@@ -865,29 +836,6 @@ two_wheels(Avatar,[SWheel1,SWheel2])->
 		DX = R*Uw*math:cos(Theta),
 		DY = R*Uw*math:sin(Theta),
 		{DX,DY}.
-		
-speak(Avatar,[Val])->
-%	io:format("Avatar:~p Speak:~p~n",[Avatar#avatar.id,Val]),
-	Avatar#avatar{sound=Val}.
-
-gestalt_output(Avatar,Gestalt)->
-	Avatar#avatar{gestalt=Gestalt}.
-
-create_offspring(Avatar,[ExoSelf_PId,CreateVal])->
-	case CreateVal > 0 of
-		true ->
-			OffspringCost = Avatar#avatar.stats*?NEURAL_COST,
-			Energy = Avatar#avatar.energy,
-			case Energy > (OffspringCost+1000) of
-				true ->io:format("Avatar Energy:~p OffspringCost:~p~n",[Energy,OffspringCost]),
-					gen_server:cast(ExoSelf_PId,{self(),mutant_clone,granted,Avatar#avatar.id}),
-					Avatar#avatar{energy=Energy-(OffspringCost+1000)};
-				false ->
-					Avatar#avatar{energy=Energy-50}
-			end;
-		false ->
-			Avatar
-	end.
 	
 spear(Avatar,[Val])->
 	case Val > 0 of
@@ -902,21 +850,6 @@ spear(Avatar,[Val])->
 		false ->
 			Avatar#avatar{spear=false}
 	end.
-	
-shoot(Avatar,[Val])->
-	case Val > 0 of
-		true ->
-			Energy = Avatar#avatar.energy,
-			case Energy > 100 of
-				true ->
-					shoot_50,%draw when shot is fired, different color from spear
-					Avatar#avatar{energy=Energy-20};
-				false ->
-					Avatar#avatar{energy=Energy-1}
-			end;
-		false ->
-			Avatar
-	end.
 
 %Sectors are 10 by 10.
 %[{3,3}] XSec = X div 10, YSec = Y div 10...
@@ -926,38 +859,6 @@ get_sector(Coord)->
 	void.
 loc2sector({X,Y})->
 	{trunc(X/?SECTOR_SIZE),trunc(Y/?SECTOR_SIZE)}.
-	
-command_generator()->
-	%quiet time in steps (100-1000)
-	%A sequence of commands is generated
-	%generated commands are set to sensors, and calcualted fitness sent to actuators
-	void.
-	
-obedience_fitness(Command,Beacon)->
-	%Fitness = ImportanceA*CommandObedience - ImportanceB*CollisionAvoidenceFirePit - ImportanceC*CollisionAvoidencePillar - ImportanceC*CollisionAvoidenceWall;
-	%1/abs(Command-DrivingDecision)=CommandObedience, CollisionAvoidence = FirePitIntersectionCount, PIllarIntersectionCount, WallIntersectionCount
-	%BEACON:
-	%distance to beacon, angle to beacon, 1/abs(DistanceFromBeacon-RequestedDistance)
-	void.
-	
-epitopes()->
-	spawn(flatland,db,[]).
-db()->
-	ets:file2tab(abc_pred10),
-	ets:file2tab(abc_pred12),
-	ets:file2tab(abc_pred14),
-	ets:file2tab(abc_pred16),
-	ets:file2tab(abc_pred18),
-	ets:file2tab(abc_pred20),
-	receive
-		terminate ->
-			ok
-	end.
-
-
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 -define(COLLISIONS,on).
@@ -971,37 +872,17 @@ world_init(World_Type,Physics,Metabolics)->
 	World_Border = [{XMin,XMax},{YMin,YMax}],
 
 	case World_Type of
-		duel ->	
-			Id=genotype:generate_UniqueId(),
-			Plants=[create_avatar(plant,plant,Id,{undefined,undefined},respawn,Metabolics)|| _<-lists:duplicate(10,1)],
-			Walls = lists:append(create_walls(),create_pillars()),
-			Scape_Physics = [],
-			Plants++Walls;
-		hunt ->
-			[];
-		dangerous_hunt ->
-			[];
 		flatland ->
-			Walls = lists:append(create_walls(),create_pillars()),
-			Rocks = create_rocks(),
-			FirePits = create_firepits(),
-			Beacons = create_beacons(),
-			Scape_Physics = [],
-			%io:format("Plants:~p~n",[Plants]),
-			Plants=[create_avatar(plant,plant,gen_id(),{undefined,return_valid(Rocks++FirePits)},respawn,Metabolics)||_<-lists:duplicate(10,1)],
-			Poisons=[create_avatar(poison,poison,gen_id(),{undefined,return_valid(Rocks++FirePits)},respawn,Metabolics)||_<-lists:duplicate(10,1)],
-			Plants;%++Rocks++Walls++Poisons++FirePits++Beacons;
-		dynamic ->
-			[];
+			Walls = create_walls(),
+			Plants=[create_avatar(plant,plant,gen_id(),{undefined,return_valid([])},respawn,Metabolics)||_<-lists:duplicate(10,1)],
+			Poisons=[create_avatar(poison,poison,gen_id(),{undefined,return_valid([])},respawn,Metabolics)||_<-lists:duplicate(10,1)],
+			Plants;%++Walls++Poisons
 		baator ->
 			Id=genotype:generate_UniqueId(),
 			Plants=[create_avatar(plant,plant,Id,{undefined,undefined},respawn,Metabolics)|| _<-lists:duplicate(10,1)],
 			Poisons=[create_avatar(poison,poison,Id,{undefined,undefined},respawn,Metabolics)|| _<-lists:duplicate(10,1)],
-			Walls = lists:append(create_walls(),create_pillars()),
-			Scape_Physics = [],
-			Plants++Walls;
-		multi_agent ->
-			[]
+			Walls = create_walls(),
+			Plants++Poisons++Walls
 	end.
 
 world_behavior(Collision,Penetration,OAvatar,Avatar)->
@@ -1319,9 +1200,6 @@ pt({OX,OY},{X,Y})->
 gen_id()->
 	genotype:generate_UniqueId().
 	
-create_seeds()->
-	[].
-	
 create_rocks()->
 	Rock_Locs = [
 		{100,100,40,inf},
@@ -1337,9 +1215,6 @@ create_rocks()->
 	],
 	[create_avatar(rock,rock,gen_id(),undefined,Rock_Loc,undefined) || Rock_Loc <- Rock_Locs].
 
-create_pillars()->
-	[].
-
 create_walls()->
 	Sections =[
 		{x_wall,{300,100,200}},
@@ -1354,28 +1229,3 @@ create_walls()->
 		{x_wall,{500,450,500}}
 	],	
 	[create_avatar(wall,wall,gen_id(),undefined,Section_Loc,undefined) || Section_Loc <- Sections].
-	
-create_firepits()->
-	FirePits=[
-		%{100,100,50,inf},
-		%{400,400,50,inf},
-		{600,100,50,inf},
-		{900,300,50,inf},
-		{800,200,50,inf},
-		{150,800,50,inf},
-		{50,500,50,inf},
-		{600,800,50,inf},
-		{500,300,50,inf}
-	],
-	[create_avatar(fire_pit,fire_pit,gen_id(),undefined,FirePit,undefined) || FirePit <- FirePits].
-	
-create_water()->
-	Waters=[
-	],
-	[create_avatar(water,water,gen_id(),undefined,Water,undefined) || Water <- Waters].
-	
-create_beacons()->
-	Beacons = [
-		{500,500,3,inf}
-	],
-	[create_avatar(beacon,beacon,gen_id(),undefined,Beacon,undefined) || Beacon <- Beacons].
