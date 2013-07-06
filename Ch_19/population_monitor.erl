@@ -695,13 +695,13 @@ gather_STATS(Population_Id,EvaluationsAcc,OpMode)->
 			void ->
 				0;
 			_ ->
-				Agent_PId=exoself:start(TopAgent_Id,self(),gentest),
+				Agent_PId=exoself:start(TopAgent_Id,self(),benchmark),
 				receive
 					{Agent_PId,benchmark_complete,Specie_Id,Fitness,Cycles,Time}->
 						genotype:print(TopAgent_Id),
-						Fitness;
-					Msg ->
-						io:format("Msg:~p~n",[Msg])
+						Fitness
+					%Msg ->
+						%io:format("Msg:~p~n",[Msg])
 				end
 		end;
 	run_GenTest(_S,_)->

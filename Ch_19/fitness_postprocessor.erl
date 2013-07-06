@@ -8,7 +8,7 @@
 -module(fitness_postprocessor).
 -compile(export_all).
 -include("records.hrl").
--define(EFF,0.1). %Efficiency.
+-define(EFF,0.01). %Efficiency.
 
 none(Agent_Summaries)->
 	lists:reverse(lists:sort(Agent_Summaries)).

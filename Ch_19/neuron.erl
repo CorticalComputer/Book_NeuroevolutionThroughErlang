@@ -143,8 +143,8 @@ loop(S,ExoSelf_PId,[SI_PId|SI_PIds],[MI_PId|MI_PIds],SIAcc,MIAcc)->
 		{ExoSelf_PId,terminate}->
 			%io:format("Neuron:~p is terminating.~n",[self()])
 			ok
-		after 10000 ->
-			io:format("neuron:~p stuck.~n",[S#state.id])
+%		after 10000 ->
+			%io:format("neuron:~p stuck.~n",[S#state.id])
 	end.
 %The neuron process waits for vector signals from all the processes that it's connected from, taking the dot product of the input and weight vectors, and then adding it to the accumulator. Once all the signals from Input_PIds are received, the accumulator contains the dot product to which the neuron then adds the bias and executes the activation function. After fanning out the output signal, the neuron again returns to waiting for incoming signals. When the neuron receives the {ExoSelf_PId,get_backup} message, it forwards to the exoself its full MInput_PIdPs list, and its Id. The MInput_PIdPs contains the modified, tuned and most effective version of the input_idps. The neuron process is also accepts weight_backup signal, when receiving it the neuron saves to process dictionary the current MInput_PIdPs. When the neuron receives the weight_restore signal, it reads back from the process dictionary the stored Input_PIdPs, and switches over to using it as its active Input_PIdPs list. When the neuron receives the weight_perturb signal from the exoself, it perturbs the weights by executing the perturb_Lipids/1 function, which returns the updated list. Finally, the neuron can also accept a reset_prep signal, which makes the neuron flush its buffer in the off chance that it has a recursively sent signal in its inbox. After flushing its buffer, the neuron waits for the exoself to send it the reset signal, at which point the neuron, now fully refreshed after the flush_buffer/0, outputs a default forward signal to its recursively connected elements, if any, and then drops back into the main loop.
 
